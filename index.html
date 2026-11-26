@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research Institutions Map</title>
+
+  <!-- MapLibre GL JS: free, open-source map rendering library. No API key required. -->
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Left sidebar: title, institution search, and country filter -->
+  <aside id="sidebar">
+
+    <!-- Page tabs: the map (this page) and the author profiles page -->
+    <nav class="tabs sidebar-section">
+      <a class="tab active" href="index.html">Map</a>
+      <a class="tab" href="authors.html">Author profiles</a>
+      <a class="tab" href="ranking.html">Ranking</a>
+    </nav>
+
+    <div class="sidebar-section">
+      <h1>Research Institutions</h1>
+      <p class="intro">Node size reflects number of papers in the ticked venues. Click a node for details.</p>
+    </div>
+
+    <!-- Search box + list of matching institutions -->
+    <div class="sidebar-section">
+      <label for="search-input" class="sidebar-label">Search institutions</label>
+      <input id="search-input" type="search" placeholder="Type an institution name…" autocomplete="off" />
+      <ul id="search-results"></ul>
+    </div>
+
+    <!-- Extendable country list: click the title to open / close it -->
+    <details class="filter-box sidebar-section">
+      <summary id="country-summary">Filter by country</summary>
+      <div class="filter-buttons">
+        <button id="select-all" type="button">Select all</button>
+        <button id="clear-all" type="button">Clear all</button>
+      </div>
+      <ul id="country-list" class="checkbox-list"></ul>
+    </details>
+
+    <!-- Same idea for venues: all paper counts and node sizes only count the ticked venues -->
+    <details class="filter-box sidebar-section">
+      <summary id="venue-summary">Filter by venue</summary>
+      <div class="filter-buttons">
+        <button id="select-all-venues" type="button">Select all</button>
+        <button id="clear-all-venues" type="button">Clear all</button>
+      </div>
+      <ul id="venue-list" class="checkbox-list"></ul>
+    </details>
+
+  </aside>
+
+  <!-- Tab button on the sidebar's edge: slides the sidebar away / brings it back -->
+  <button id="sidebar-toggle" type="button" aria-label="Hide sidebar" title="Hide sidebar"></button>
+
+  <div id="map"></div>
+
+  <!-- Small status/error box, mainly useful while debugging on GitHub Pages -->
+  <div id="status" class="status" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Author Ranking</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="authors-page">
+
+  <!-- Page tabs -->
+  <nav class="tabs">
+    <a class="tab" href="index.html">Map</a>
+    <a class="tab" href="authors.html">Author profiles</a>
+    <a class="tab active" href="ranking.html">Ranking</a>
+  </nav>
+
+  <main class="authors-main">
+    <h1>Author ranking</h1>
+    <p id="ranking-status" class="intro">Loading ranking…</p>
+
+    <!-- Filled in by ranking.js; click a name to open that author's profile -->
+    <table id="ranking-table" hidden>
+      <thead>
+        <tr>
+          <th data-sort="rank">Rank</th>
+          <th data-sort="name">Author</th>
+          <th data-sort="points" class="number">Points</th>
+          <th data-sort="first" class="number">First</th>
+          <th data-sort="middle" class="number">Middle</th>
+          <th data-sort="last" class="number">Last</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+
+  <script src="ranking.js"></script>
+</body>
+</html>

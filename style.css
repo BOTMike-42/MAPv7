@@ -1,0 +1,674 @@
+/* ---------- Base layout ---------- */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #111;
+  background: #fff;
+}
+
+/* ---------- Sidebar ---------- */
+/* The sidebar floats ON TOP of the map. Only its BACKGROUND is see-through
+   (the 0.7 in rgba is the opacity: lower = more see-through, 1 = solid).
+   Text, buttons and the search box stay fully solid.
+   The width (320px) is also used by the toggle button and status box below
+   and by SIDEBAR_WIDTH in app.js; change them together. */
+#sidebar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 320px;
+  z-index: 3;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.7);
+  border-right: 1px solid #000;
+  transition: transform 0.3s ease;
+}
+
+/* Hidden state: the sidebar slides out past the left edge of the screen. */
+body.sidebar-closed #sidebar {
+  transform: translateX(-100%);
+}
+
+/* ---------- Sidebar toggle tab ---------- */
+#sidebar-toggle {
+  position: absolute;
+  top: 14px;
+  left: 320px; /* sits on the sidebar's right edge */
+  z-index: 4;
+  width: 30px;
+  height: 44px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+  font-family: inherit;
+  color: #000;
+  background: #fff;
+  border: 1px solid #000;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  transition: left 0.3s ease;
+}
+
+#sidebar-toggle::before {
+  content: "\2039"; /* arrow pointing left = "hide" */
+}
+
+#sidebar-toggle:hover {
+  background: #000;
+  color: #fff;
+}
+
+body.sidebar-closed #sidebar-toggle {
+  left: 0;
+}
+
+body.sidebar-closed #sidebar-toggle::before {
+  content: "\203A"; /* arrow pointing right = "show" */
+}
+
+.sidebar-section {
+  padding: 14px 18px;
+  border-bottom: 1px solid #ccc;
+}
+
+#sidebar h1 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+}
+
+#sidebar .intro {
+  margin: 0;
+  font-size: 12.5px;
+  color: #444;
+  line-height: 1.4;
+}
+
+.sidebar-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+#search-input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #000;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 4px;
+}
+
+#search-input:focus {
+  outline: 2px solid #000;
+  outline-offset: 1px;
+}
+
+/* ---------- Search results list ---------- */
+#search-results {
+  list-style: none;
+  margin: 8px 0 0 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+#search-results li {
+  padding: 7px 8px;
+  font-size: 12.5px;
+  line-height: 1.3;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+#search-results li:hover,
+#search-results li:focus {
+  background: #000;
+  color: #fff;
+  outline: none;
+}
+
+#search-results li.no-hover {
+  cursor: default;
+  color: #666;
+}
+
+#search-results li.no-hover:hover {
+  background: none;
+  color: #666;
+}
+
+.result-meta {
+  color: #777;
+  font-size: 11.5px;
+}
+
+#search-results li:hover .result-meta,
+#search-results li:focus .result-meta {
+  color: #ccc;
+}
+
+/* ---------- Country filter ---------- */
+.filter-box summary {
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 8px 0;
+}
+
+.filter-buttons button {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  color: #000;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filter-buttons button:hover {
+  background: #000;
+  color: #fff;
+}
+
+.checkbox-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.checkbox-list label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.checkbox-list input[type="checkbox"] {
+  accent-color: #000;
+  margin: 0;
+}
+
+.checkbox-list .count {
+  margin-left: auto;
+  color: #777;
+  font-size: 11.5px;
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0; /* full screen: the sidebar floats on top */
+  right: 0;
+}
+
+/* Force the base map tiles to render fully black & white, as a safety
+   net on top of the already-minimal grayscale basemap. This only
+   targets the map's own canvas, not popups, so popup styling is
+   unaffected. */
+.maplibregl-canvas {
+  filter: grayscale(100%) contrast(1.05);
+}
+
+/* ---------- Status / error box ---------- */
+.status {
+  position: absolute;
+  bottom: 16px;
+  left: 346px; /* sidebar width (320px) + toggle tab + gap */
+  transition: left 0.3s ease;
+  z-index: 2;
+  background: #fff;
+  border: 1px solid #000;
+  color: #000;
+  padding: 10px 14px;
+  font-size: 13px;
+  max-width: 360px;
+  border-radius: 4px;
+}
+
+/* When the sidebar is hidden, the status box moves back to the left edge. */
+body.sidebar-closed .status {
+  left: 46px; /* leaves room for the small tab button */
+}
+
+/* ---------- Popup (black & white theme) ---------- */
+.maplibregl-popup-content {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 4px;
+  padding: 12px 14px;
+  box-shadow: none;
+  font-family: inherit;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: #000 !important;
+  border-bottom-color: #000 !important;
+}
+
+.popup-institution {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #000;
+}
+
+.popup-row {
+  font-size: 12.5px;
+  color: #222;
+  margin: 2px 0;
+}
+
+.popup-row span.label {
+  color: #666;
+}
+
+/* Links inside popups (top authors) stay black & white */
+.popup-list a {
+  color: #000;
+}
+
+.popup-note {
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: #666;
+}
+
+/* ---------- MapLibre attribution: keep readable ---------- */
+.maplibregl-ctrl-attrib {
+  font-size: 11px;
+}
+
+/* ---------- Country popup: top institutes list ---------- */
+.popup-list {
+  margin: 4px 0 0 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  color: #222;
+}
+
+.popup-list li {
+  margin: 2px 0;
+}
+
+.popup-list span.label {
+  color: #666;
+}
+
+/* ---------- Page tabs (Map | Author profiles) ---------- */
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab {
+  flex: 1;
+  padding: 7px 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  color: #000;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 4px;
+}
+
+.tab:hover,
+.tab.active {
+  background: #000;
+  color: #fff;
+}
+
+/* ---------- Author profiles page (authors.html) ---------- */
+.authors-page {
+  height: auto;
+  min-height: 100%;
+}
+
+.authors-page .tabs {
+  max-width: 420px;
+  padding: 14px 18px;
+}
+
+.authors-main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 8px 18px 60px 18px;
+}
+
+.authors-main h1 {
+  margin: 0 0 4px 0;
+  font-size: 22px;
+}
+
+.authors-main .intro {
+  margin: 0 0 14px 0;
+  font-size: 13px;
+  color: #444;
+}
+
+.search-wrap {
+  position: relative;
+}
+
+#author-input {
+  width: 100%;
+  padding: 11px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #000;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 4px;
+}
+
+#author-input:focus {
+  outline: 2px solid #000;
+  outline-offset: 1px;
+}
+
+/* Suggestion list that drops down under the search box */
+#author-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  list-style: none;
+  margin: 2px 0 0 0;
+  padding: 0;
+  max-height: 340px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 4px;
+}
+
+#author-suggestions li {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+#author-suggestions li:hover,
+#author-suggestions li.highlighted {
+  background: #000;
+  color: #fff;
+}
+
+#author-suggestions .meta {
+  font-size: 12px;
+  color: #777;
+}
+
+#author-suggestions li:hover .meta,
+#author-suggestions li.highlighted .meta {
+  color: #ccc;
+}
+
+/* The profile itself */
+#profile {
+  margin-top: 26px;
+}
+
+#profile h2 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.stat {
+  padding: 8px 14px;
+  border: 1px solid #000;
+  border-radius: 4px;
+}
+
+.stat .value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.stat .label {
+  font-size: 11.5px;
+  color: #666;
+}
+
+.profile-note {
+  margin: 0 0 14px 0;
+  font-size: 12.5px;
+  color: #555;
+}
+
+#profile h3 {
+  margin: 22px 0 8px 0;
+  font-size: 15px;
+  border-bottom: 1px solid #000;
+  padding-bottom: 4px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chip {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  color: #000;
+  text-decoration: none;
+  border: 1px solid #000;
+  border-radius: 14px;
+}
+
+a.chip:hover {
+  background: #000;
+  color: #fff;
+}
+
+span.chip {
+  border-color: #aaa;
+  color: #444;
+}
+
+#paper-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#paper-list li {
+  padding: 9px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.paper-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.paper-meta {
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: #555;
+}
+
+.paper-meta a {
+  color: #000;
+}
+
+/* ---------- Ranking page (ranking.html) ---------- */
+#ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+#ranking-table th {
+  text-align: left;
+  padding: 8px 10px;
+  color: #fff;
+  background: #000;
+  position: sticky;
+  top: 0;
+}
+
+/* Column titles are clickable: they re-sort the list */
+#ranking-table th[data-sort] {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+#ranking-table th[data-sort]:hover {
+  background: #333;
+}
+
+#ranking-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+#ranking-table tr:hover td {
+  background: #f2f2f2;
+}
+
+#ranking-table .number {
+  text-align: right;
+  white-space: nowrap;
+}
+
+#ranking-table a {
+  color: #000;
+  font-weight: 700;
+}
+
+/* ---------- v5: popups ---------- */
+/* "Papers per venue" list in popups: click the title to open / close it */
+.popup-venues {
+  margin: 4px 0;
+  font-size: 12.5px;
+}
+
+.popup-venues summary {
+  cursor: pointer;
+  color: #666;
+}
+
+.popup-venues summary:hover {
+  color: #000;
+}
+
+/* Popups can get long now; let them scroll instead of running off screen */
+.maplibregl-popup-content {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* ---------- v5: author profile ---------- */
+.profile-links {
+  margin: 0 0 6px 0;
+  font-size: 13.5px;
+}
+
+.profile-links a {
+  color: #000;
+  font-weight: 700;
+}
+
+.profile-email {
+  margin: 0 0 14px 0;
+  font-size: 13.5px;
+}
+
+.profile-email .mark {
+  display: inline-block;
+  width: 1.3em;
+  text-align: center;
+  font-weight: 700;
+}
+
+.profile-email .mark.no {
+  color: #888;
+}
+
+.collaborator-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+}
+
+.collaborator-list li {
+  margin: 4px 0;
+}
+
+.collaborator-list a {
+  color: #000;
+  font-weight: 700;
+}
+
+/* Affiliation chips, shaded by how many sources (DBLP, ORCID, OpenAlex)
+   name the affiliation: 3 = black, 2 = dark grey, 1 = light outline */
+.chip.sources-3 {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.chip.sources-2 {
+  background: #777;
+  color: #fff;
+  border-color: #777;
+}
+
+.chip.sources-1 {
+  background: #fff;
+  color: #555;
+  border-color: #bbb;
+}
+
+a.chip.sources-3:hover,
+a.chip.sources-2:hover,
+a.chip.sources-1:hover {
+  background: #fff;
+  color: #000;
+  border-color: #000;
+}

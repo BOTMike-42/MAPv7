@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Author Profiles</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="authors-page">
+
+  <!-- Page tabs: back to the map, or stay on the author profiles -->
+  <nav class="tabs">
+    <a class="tab" href="index.html">Map</a>
+    <a class="tab active" href="authors.html">Author profiles</a>
+    <a class="tab" href="ranking.html">Ranking</a>
+  </nav>
+
+  <main class="authors-main">
+    <h1>Author profiles</h1>
+    <p class="intro">Start typing a name, then pick the author from the list.</p>
+
+    <!-- Search box with a drop-down list of matching names -->
+    <div class="search-wrap">
+      <input id="author-input" type="search" placeholder="Type an author's name…" autocomplete="off" disabled />
+      <ul id="author-suggestions" hidden></ul>
+    </div>
+
+    <p id="author-status" class="intro">Loading authors…</p>
+
+    <!-- Filled in by authors.js when an author is picked -->
+    <section id="profile" hidden></section>
+  </main>
+
+  <script src="authors.js"></script>
+</body>
+</html>
