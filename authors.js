@@ -299,6 +299,31 @@ function buildAffiliations(author) {
 }
 
 /**
+ * "Papers per venue": how many of the author's papers appeared in each
+ * venue, most first (counted from papers.json, same venues as the map).
+ */
+function buildVenueCounts(author) {
+  const counts = new Map();
+  for (const index of author.papers) {
+    const venue = papers[index].venue;
+    counts.set(venue, (counts.get(venue) || 0) + 1);
+  }
+
+  const section = createElement("div");
+  section.append(createElement("h3", "", "Papers per venue"));
+  const list = createElement("ul", "venue-counts");
+  [...counts]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .forEach(([venue, count]) => {
+      const item = createElement("li", "", venue);
+      item.append(createElement("span", "profile-note", ` (${count})`));
+      list.append(item);
+    });
+  section.append(list);
+  return section;
+}
+
+/**
  * One paper: title, then year · venue · DOI.
  */
 function buildPaper(paper) {
@@ -358,7 +383,7 @@ function showProfile(author) {
   if (links) profileBox.append(links);
   profileBox.append(buildEmail(author));
 
-  profileBox.append(buildAffiliations(author), buildCollaborators(author), buildPaperList(author));
+  profileBox.append(buildAffiliations(author), buildCollaborators(author), buildVenueCounts(author), buildPaperList(author));
   profileBox.hidden = false;
 }
 
