@@ -65,12 +65,15 @@ function createElement(tag, className, text) {
 /* ---------- Searching ---------- */
 
 /**
- * Prepares every author for fast searching.
+ * Prepares every author for fast searching. Other spellings of the name
+ * ("aliases", e.g. "Adam Joinson" for "Adam N. Joinson") are searchable too.
  */
 function prepareSearch() {
   for (const author of authors) {
-    author.words = splitWords(normalizeText(author.name));
-    author.key = author.words.join(" ");
+    author.forms = [author.name, ...(author.aliases || [])].map((name) => {
+      const words = splitWords(normalizeText(name));
+      return { words, key: words.join(" ") };
+    });
   }
 }
 
@@ -83,10 +86,11 @@ function findAuthors(query) {
   if (queryWords.length === 0) return [];
 
   const queryText = queryWords.join(" ");
-  const startsWithQuery = (author) => (author.key.startsWith(queryText) ? 0 : 1);
+  const startsWithQuery = (author) => (author.forms.some((f) => f.key.startsWith(queryText)) ? 0 : 1);
+  const matches = (form) => queryWords.every((q) => form.words.some((w) => w.startsWith(q)));
 
   return authors
-    .filter((author) => queryWords.every((q) => author.words.some((w) => w.startsWith(q))))
+    .filter((author) => author.forms.some(matches))
     .sort(
       (a, b) =>
         startsWithQuery(a) - startsWithQuery(b) ||
@@ -122,6 +126,9 @@ function buildSuggestion(author) {
   item.append(createElement("div", "", author.name));
 
   const details = [];
+  const typed = normalizeText(authorInput.value);
+  const alias = (author.aliases || []).find((a) => normalizeText(a).includes(typed.trim()));
+  if (alias && !normalizeText(author.name).includes(typed.trim())) details.push(`also: ${alias}`);
   details.push(author.rank ? `${author.points} points · rank ${author.rank}` : `${author.points} points`);
   if (author.affiliations.length > 0) details.push(author.affiliations[0].name);
   if (details.length > 0) item.append(createElement("div", "meta", details.join(" · ")));
@@ -378,6 +385,9 @@ function showProfile(author) {
       `Authorship: ${author.first} first, ${author.middle} middle, ${author.last} last.`
     )
   );
+  if (author.aliases) {
+    profileBox.append(createElement("p", "profile-note", `Also published as: ${author.aliases.join(", ")}.`));
+  }
 
   const links = buildLinks(author);
   if (links) profileBox.append(links);
@@ -417,7 +427,12 @@ function loadData() {
       authors = authorData.authors;
       rankedCount = authorData.rankedCount;
       papers = paperData;
-      authorsByName = new Map(authors.map((a) => [a.name, a]));
+      // Old spellings lead to the same person (links from earlier versions keep working).
+      authorsByName = new Map();
+      for (const a of authors) {
+        for (const alias of a.aliases || []) authorsByName.set(alias, a);
+      }
+      for (const a of authors) authorsByName.set(a.name, a);
 
       prepareSearch();
       authorInput.disabled = false;
