@@ -686,3 +686,14 @@ a.chip.sources-1:hover {
 #ranking-table .mark.no {
   color: #888;
 }
+
+/* Author profile: papers per venue */
+.venue-counts {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+}
+
+.venue-counts li {
+  margin: 3px 0;
+}
