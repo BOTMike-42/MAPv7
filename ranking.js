@@ -7,6 +7,9 @@
  * reverse it). The RANK numbers never change: they always come from the
  * points, only the order of the rows changes.
  * Clicking a name opens that author's profile.
+ * The Email column shows ✓ (an email address is known) or ⊘ (none); the
+ * address itself is never shown. Sorting by it puts ✓ (or ⊘) first, and
+ * within each group the authors stay in rank order.
  */
 
 const AUTHORS_PATH = "authors.json";
@@ -20,6 +23,7 @@ const SORT_COLUMNS = {
   first: { value: (a) => a.first, startsDescending: true },
   middle: { value: (a) => a.middle, startsDescending: true },
   last: { value: (a) => a.last, startsDescending: true },
+  email: { value: (a) => (a.hasEmail ? 1 : 0), startsDescending: true },
 };
 
 const statusLine = document.getElementById("ranking-status");
@@ -41,6 +45,20 @@ function createCell(text, className) {
 }
 
 /**
+ * The Email cell: a tick when an email address is known, a crossed-out
+ * circle when not (same marks as on the profile page).
+ */
+function createMarkCell(hasEmail) {
+  const cell = createCell("", "mark-cell");
+  const mark = document.createElement("span");
+  mark.className = hasEmail ? "mark yes" : "mark no";
+  mark.textContent = hasEmail ? "✓" : "⊘";
+  mark.title = hasEmail ? "Email address known" : "No email address known";
+  cell.append(mark);
+  return cell;
+}
+
+/**
  * Creates one table row for an author. The name is a link to the profile page.
  */
 function buildRow(author) {
@@ -58,7 +76,8 @@ function buildRow(author) {
     createCell(author.points, "number"),
     createCell(author.first, "number"),
     createCell(author.middle, "number"),
-    createCell(author.last, "number")
+    createCell(author.last, "number"),
+    createMarkCell(author.hasEmail)
   );
   return row;
 }
