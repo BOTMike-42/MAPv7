@@ -672,3 +672,17 @@ a.chip.sources-1:hover {
   color: #000;
   border-color: #000;
 }
+
+/* Ranking table: the Email column (✓ / ⊘) */
+#ranking-table .mark-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+#ranking-table .mark {
+  font-weight: 700;
+}
+
+#ranking-table .mark.no {
+  color: #888;
+}
